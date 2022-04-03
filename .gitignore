@@ -1,0 +1,8 @@
+__pycache__/*
+*.pyc
+storage/*
+[0-9]*.txt
+test_storage/*
+test_storage2/*
+.vscode
+.pytest*
