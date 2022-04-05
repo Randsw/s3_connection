@@ -3,10 +3,8 @@ on:
   push:
     branches:
       - "main"
-env:
-  GO_VERSION: 1.17
 jobs:
-  minio:
+  test_s3_storage:
     name: minio
     runs-on: ubuntu-latest
     services:
@@ -18,7 +16,7 @@ jobs:
           MINIO_ACCESS_KEY: 12345678
           MINIO_SECRET_KEY: password
         volumes:
-          - ${{ github.workspace }}/data:/data
+          - /tmp/data:/data
         options: --name=minio --health-cmd "curl http://localhost:9000/minio/health/live"
     steps:
       - name: Check out code
