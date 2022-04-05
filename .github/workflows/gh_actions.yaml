@@ -28,4 +28,4 @@ jobs:
       - name: Install pip requirements
         run: pip install -r requirements.txt
       - name: Run test
-      - run: pytest test_s3_storage.py
+        run: pytest test_s3_storage.py
