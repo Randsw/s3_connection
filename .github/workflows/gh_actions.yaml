@@ -1,0 +1,31 @@
+name: S3_storage
+on:
+  push:
+    branches:
+      - "main"
+env:
+  GO_VERSION: 1.17
+jobs:
+  minio:
+    name: minio
+    runs-on: ubuntu-latest
+    services:
+      minio:
+        image: lazybit/minio
+        ports:
+          - 9000:9000
+        env:
+          MINIO_ACCESS_KEY: 12345678
+          MINIO_SECRET_KEY: password
+        volumes:
+          - ${{ github.workspace }}/data:/data
+        options: --name=minio --health-cmd "curl http://localhost:9000/minio/health/live"
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v1
+        with:
+          fetch-depth: 1
+      - name: Install pip requirements
+        run: pip install -r requirements.txt
+      - name: Run test
+      - run: pytest test_s3_storage.py
