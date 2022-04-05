@@ -1,2 +1,2 @@
-minio=7.1.5
-pytest=7.1.1
+minio==7.1.5
+pytest==7.1.1
