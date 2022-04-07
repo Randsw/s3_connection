@@ -4,19 +4,19 @@ import os
 from s3_logger import S3Logger
 
 
-class S3_storage:
+class S3Storage:
     """
-    S3_storage Class
-    self.address    - minio adres
+    S3Storage Class
+    self.address - minio address
     self.access_key - minio access key - aws s3 like
     self.secret_key - minio secret key - aws s3 like
     self.secure     - enable TLS
     method list_bucket() - list all buckets
     method create_bucket(self, bucket_name) - create bucket
     method delete_bucket(self, bucket_name) - delete bucket
-    method put_objects(self, objects, bucket_name) - Put file on backet
+    method put_objects(self, objects, bucket_name) - Put file on bucket
     method get_objects(self, objects, path, bucket_name) - Get object from bucket and put in filesystem by path
-    method delete_objects(self, objects, bucketname) - Delete objects in bucket
+    method delete_objects(self, objects, bucket_name) - Delete objects in bucket
     method list_objects(self, bucket_name, prefix) - List all object in bucket using prefix
     """
 
@@ -32,7 +32,7 @@ class S3_storage:
         """Create bucket in s3
 
         Parameters:
-        bucketname (string): Name of bucket
+        bucket_name (string): Name of bucket
 
         Returns:
         None
@@ -48,7 +48,7 @@ class S3_storage:
         """Delete bucket in s3
 
         Parameters:
-        bucketname (string): Name of bucket
+        bucket_name (string): Name of bucket
 
         Returns:
         None
@@ -82,10 +82,10 @@ class S3_storage:
         None
 
         """
-        for object in objects:
+        for s3_object in objects:
             try:
-                self.client.fput_object(bucket_name, os.path.basename(object), object)
-                self.S3logger.logger.info(f'Put {object} in {bucket_name} bucket')
+                self.client.fput_object(bucket_name, os.path.basename(s3_object), s3_object)
+                self.S3logger.logger.info(f'Put {s3_object} in {bucket_name} bucket')
             except S3Error as err:
                 self.S3logger.logger.error(err)
 
@@ -95,43 +95,42 @@ class S3_storage:
         Parameters:
         objects (List): Objects names in bucket
         path (string): Filepath ti save objects
-        bucketname (string): Name of bucket
+        bucket_name (string): Name of bucket
 
         Returns:
         None
 
         """
-        for object in objects:
+        for s3_object in objects:
             try:
-                self.client.fget_object(bucket_name, object, os.path.join(path, object))
-                self.S3logger.logger.info(f'Get {object} to {path}')
+                self.client.fget_object(bucket_name, s3_object, os.path.join(path, s3_object))
+                self.S3logger.logger.info(f'Get {s3_object} to {path}')
             except S3Error as err:
                 self.S3logger.logger.error(err)
 
-    def delete_objects(self, objects, bucketname):
+    def delete_objects(self, objects, bucket_name):
         """Delete objects in bucket
 
         Parameters:
         objects (List): List of object name to delete from bucket
-        bucketname (string): Name of bucket
+        bucket_name (string): Name of bucket
 
         Returns:
         None
 
         """
-        for object in objects:
+        for s3_object in objects:
             try:
-                self.client.remove_object(bucketname, object)
-                self.S3logger.logger.info(f'Delete {object} from {bucketname} bucket')
+                self.client.remove_object(bucket_name, s3_object)
+                self.S3logger.logger.info(f'Delete {s3_object} from {bucket_name} bucket')
             except S3Error as err:
                 self.S3logger.logger.error(err)
-
 
     def list_objects(self, bucket_name, prefix=""):
         """List objects in bucket
 
         Parameters:
-        bucketname (string): Name of bucket
+        bucket_name (string): Name of bucket
         prefix (string): object name starts with prefix.
 
         Returns:
@@ -142,23 +141,23 @@ class S3_storage:
 
 
 if __name__ == "__main__":
-    fileobjects = ["./test_storage/1.txt", "./test_storage/2.txt", "./test_storage/3.txt"]
-    bucketname = 'mybacket'
+    file_objects = ["./test_storage/1.txt", "./test_storage/2.txt", "./test_storage/3.txt"]
+    s3_bucket_name = 'my-bucket'
 
-    my_s3 = S3_storage('127.0.0.1:9000', '12345678', 'password')
+    my_s3 = S3Storage('127.0.0.1:9000', '12345678', 'password')
     
-    my_s3.create_bucket(bucketname)
+    my_s3.create_bucket(s3_bucket_name)
 
     buckets = my_s3.list_bucket()
     for bucket in buckets:
         print(bucket.name, bucket.creation_date)
 
-    my_s3.put_objects(fileobjects, bucketname)
+    my_s3.put_objects(file_objects, s3_bucket_name)
 
-    s3_objects = [object.object_name for object in my_s3.list_objects(bucketname)]
+    s3_objects = [s3_object.object_name for s3_object in my_s3.list_objects(s3_bucket_name)]
 
-    my_s3.get_objects(s3_objects, "./test_storage2", bucketname)
+    my_s3.get_objects(s3_objects, "./test_storage2", s3_bucket_name)
 
-    my_s3.delete_objects(s3_objects, bucketname)
+    my_s3.delete_objects(s3_objects, s3_bucket_name)
 
-    my_s3.delete_bucket(bucketname)
+    my_s3.delete_bucket(s3_bucket_name)

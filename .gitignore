@@ -6,3 +6,4 @@ test_storage/*
 test_storage2/*
 .vscode
 .pytest*
+.idea/*
